@@ -54,6 +54,8 @@ class System (Hypergraph):
         self.mu = self.zeta.map(
             lambda zn, n: self.invert(zn, n)
         )
+        ## c_b = sum_a mu_ab for a >= b
+        self.bethe = self.mu[0].uncurry().sum(0)
         
         # Differential and codifferential
 
@@ -61,7 +63,7 @@ class System (Hypergraph):
         self.delta = Product(self.codiff(i) for Ni, i in self.N)
         d = sum(di for di, i in self.d)
         L = d @ d.t() + d.t() @ d
-        self.Laplacian = L
+        self.laplacian = L
 
         # Functors 
 
@@ -177,9 +179,9 @@ class System (Hypergraph):
     
     def __getitem__(self, n): 
         if type(n) == tuple:
-            Kn = (self.nerve(ni) for ni in n)
-            return [a for a in product(*Kn)]
-        return self.nerve(n)
+            Kn = (self[ni] for ni in n)
+            return (a for a in product(*Kn))
+        return (a for Na, a in self.N[n])
     
     def __repr__(self): 
         elems = [str(e) for e in self]

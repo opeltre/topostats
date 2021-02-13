@@ -16,6 +16,9 @@ class VectorMixin(MapMixin):
             (other[i] if i in other else 0)
         return self.__class__({i: s(i) for i in D}).trim()
 
+    def __neg__(self): 
+        return -1 * self
+
     def __sub__(self, other): 
         return self.__add__(-1 * other)
 
@@ -50,7 +53,7 @@ class VectorMixin(MapMixin):
                 if isinstance(t, (torch.Tensor, VectorMixin)) \
                 else t ** 2
         n2 = self.fmap(norm2)
-        return sum(ni for ni, i in n2)
+        return torch.sqrt(sum(ni for ni, i in n2))
 
     def trim(self): 
         cls = self.__class__
