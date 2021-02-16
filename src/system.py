@@ -111,23 +111,23 @@ class System (Hypergraph):
 
     def extend(self, a, b):
         pull = [slice(None) if i in b else None for i in a]
-        J_ab = lambda tb: tb[pull]
-        J_ab.__name__ = f"Extend {a} < {b}"
+        def J_ab (tb): 
+            return tb[pull]
+        J_ab.__name__ = f"J {a} < {b}"
         return J_ab
 
     def project(self, a, b):
         dim = tuple((i for i, x in enumerate(a) if x not in b))
-        S_ab = lambda qa: torch.sum(qa, dim=dim)
+        def S_ab (qa):
+            return qa.sum(qa, dim=dim)
         S_ab.__name__ = f"Sum {a} > {b}"
         return S_ab
 
     def effective(self, a, b=None): 
-        if not b or len(b) == 0:
-            F_a = lambda ha: - torch.logsumexp(-ha)
-            F_a.__name__ = f"Free Energy {a}"
-            return F_a
-        S_ab = self.project(a, b)
-        F_ab = lambda ha: - torch.log(S_ab(torch.exp(-ha)))
+        dim = tuple((i for i, x in enumerate(a) if x not in b))\
+            if b else tuple(i for i in range(len(a)))
+        def F_ab(ta): 
+            return -torch.logsumexp(-ta, dim=dim)
         F_ab.__name__ = f"Effective Energy {a} > {b}"
         return F_ab
 

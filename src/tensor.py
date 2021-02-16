@@ -1,5 +1,6 @@
 import torch 
 from functools import reduce
+from math import sqrt
 
 from set import MapMixin
 from dict import Record 
@@ -47,13 +48,18 @@ class VectorMixin(MapMixin):
         return sum(
             ti.sum() if isTensor(ti) else ti \
             for ti, i in self)
+    
+    def sqnorm(self): 
+        def n2(t):
+            T = (torch.Tensor, VectorMixin)
+            return t.norm() ** 2 if isinstance(t, T) else t ** 2
+        squares = self.fmap(n2)
+        return sum(ni for ni, i in squares)
 
     def norm(self): 
-        norm2 = lambda t: t.norm() ** 2 \
-                if isinstance(t, (torch.Tensor, VectorMixin)) \
-                else t ** 2
-        n2 = self.fmap(norm2)
-        return torch.sqrt(sum(ni for ni, i in n2))
+        n2 = self.sqnorm()
+        return torch.sqrt(n2) if isinstance(n2, torch.Tensor)\
+            else sqrt(n2)
 
     def trim(self): 
         cls = self.__class__

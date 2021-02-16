@@ -1,6 +1,25 @@
 import torch
 from functional import Functional
 
+"""
+    # Diffusion: 
+
+          zeta    -D       d*
+        u ---> U ---> Phi ---> du 
+        |                       |
+       (+=) <-------------------'
+
+    Some uses may only want to get `u(n)` given `u(0)` but 
+    we may also want to introduce a writer instance along
+    the loop to track and monitor the diffusion flow.
+"""
+
+class Orbit (Record): 
+
+    def __init__(self, u):
+        pass
+
+
 class Diffusion:
 
     def __init__(self, K, bethe=True): 
